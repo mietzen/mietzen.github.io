@@ -1,0 +1,167 @@
+name: "Deploy Blog"
+
+on:
+  schedule:
+    - cron:  '30 18 * * *'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  refresh-and-build-blog:
+    name: "Refresh Blog"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2
+          bundler-cache: true
+
+      - name: Load Gists
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          cd `mktemp -d`
+          base_dir=$(pwd)
+          gh_user=$(gh api user | jq -r '.login')
+
+          echo ""
+          echo "Getting Gists:"
+          echo "--------------"
+          gh gist list --public --limit 1000 | awk '{print $1}' | while read -r id; do
+              dir_name=$(gh gist view --files "${id}" | grep '\.md'  | cut -d '.' -f1)
+              if [[ ${dir_name} ]]; then
+                  gh gist clone ${id} "${dir_name}"
+
+                  cd ${dir_name}
+                  first_commit_date=$(git log --reverse --format=%ad --date=format:'%Y-%m-%d' | head -n 1)
+                  first_commit_ts=$(git log --reverse --format=%ad --date=format:'%Y-%m-%d %H:%M:%S' | head -n 1)
+                  latest_edited=$(git log --reverse --format=%ad --date=format:'%Y-%m-%d %H:%M:%S' | tail -n 1)
+                  cd ${base_dir}
+
+                  file_name="${first_commit_date}-${dir_name}.md"
+                  mv ${dir_name}/${dir_name}.md ${first_commit_date}-${dir_name}.md
+                  rm -rf ${dir_name}
+
+                  forks=$(curl -SsL https://api.github.com/gists/${id}/forks | jq length)
+                  stars=$(gh api graphql -f query="query{viewer{gist(name:\"${id}\"){stargazerCount}}}" --template='{{.data.viewer.gist.stargazerCount}}')
+
+                  title=$(grep -m 1 '^#' ${file_name} | sed 's/^# *//')
+                  sed -i "/^# ${title}$/,+1 d" ${file_name}
+
+                  echo "Add Source"
+                  echo -e "\n\n**Gist-Source:** [${dir_name}.md](https://gist.github.com/${gh_user}/${id}/)" >> ${file_name}
+
+                  echo "Add Header"
+                  echo "---
+          title: ${title}
+          date: ${first_commit_ts}
+          last_modified_at: ${latest_edited}
+          author: ${gh_user}
+          categories: [Coding]
+          tags: [gist]
+          stars: ${stars}
+          forks: ${forks}
+          ---
+
+          $(cat ./${file_name})" > ${file_name}
+              fi
+          done
+
+          echo ""
+          echo "Correct linked markdown files to use local paths:"
+          echo "-------------------------------------------------"
+          find . -type f -exec grep -l -E "https://gist.github.com/${gh_user}/[a-z0-9\#\-]+md" {} + | while read -r file; do
+              grep -E -o "https://gist.github.com/${gh_user}/[a-z0-9\#\-]+md" "$file" | while read -r url; do
+                  cd $(dirname  ${file})
+                  file_name=$(basename ${file})
+                  echo "Fixing links in: ${file_name}"
+                  linked_file_name=$(gh gist view --files "${url}" | tr -d '[:space:]')
+                  linked_file_path=$(find . -type f -name "*-${linked_file_name}" | cut -d'/' -f2 | tr -d '[:space:]')
+                  url=$(echo "${url}" | cut -d '#' -f1)
+                  if [[ "${file_name}" != "${linked_file_name}" ]]; then
+                      linked_file_path=$(echo "../$(echo ${linked_file_path} | cut -c12- | cut -d '.' -f1)")
+                      sed -i -E "s#\[(.*)\]\(${url}[a-zA-Z0-\#\-]+#[\1](${linked_file_path}#" ${file_name}
+                  fi
+                  cd ${base_dir}
+              done
+          done
+
+          cd ${{ github.workspace }}
+          mkdir -p ./_posts/
+          echo ""
+          echo "Copying generated files:"
+          echo "------------------------"
+          cp -Rv ${base_dir}/*.md ./_posts/
+
+          echo ""
+          echo "Removing files that no longer exist as Gist:"
+          echo "--------------------------------------------"
+
+          cd ./_posts/
+          get_local_md_files() {
+              ls | cut -c12- | sort -n
+          }
+
+          get_gist_md_files() {
+              gh gist list --public --limit 1000 | awk '{print $1}' | while read -r id; do
+                  gh gist view --files $id | grep '\.md'
+              done | sort -n
+          }
+
+          diff <(get_local_md_files) <(get_gist_md_files) | grep '< ' | cut -d '<' -f2 | xargs | while read -r file; do
+              file_path=$(find . -type f -name "*-${file}")
+              if [ -n "${file_path}" ]; then
+                  echo "Removing: ${file_path}"
+                  rm "${file_path}"
+              else
+                  echo "File not found: ${file_path}"
+              fi
+          done
+
+      - name: Decrypt imprint adress
+        run: |
+          decrypted_text=$(sed -n '0,/.*\[OBFUSCATED\]\(.*\)\[\/OBFUSCATED\].*/s//\1/p' _tabs/imprint-and-privacy-policy.md | base64 -d)
+          sed -i -E "s/\[OBFUSCATED\][a-zA-Z0-9=+\/]+\[\/OBFUSCATED\]/${decrypted_text}/g" _tabs/imprint-and-privacy-policy.md
+
+      - name: Build site
+        run: bundle exec jekyll b
+        env:
+          JEKYLL_ENV: "production"
+
+      - name: Test site
+        run: |
+          bundle exec htmlproofer _site \
+            \-\-disable-external=true \
+            \-\-ignore_missing_alt=true \
+            \-\-ignore-urls "/^http:\/\/127.0.0.1/,/^http:\/\/0.0.0.0/,/^http:\/\/localhost/"
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "_site"
+
+  deploy:
+    name: "Deploy Pages"
+    needs: refresh-and-build-blog
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

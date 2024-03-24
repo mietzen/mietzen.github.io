@@ -97,6 +97,12 @@ refactor: true
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa-solid fa-star"></i>&nbsp;&nbsp;<b>{{ post.stars }}</b>
                   </span>
                 {% endif %}
+                <!-- gist comments -->
+                {% if post.comments %}
+                  <span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa-solid fa-comment"></i>&nbsp;&nbsp;<b>{{ post.comments }}</b>
+                  </span>
+                {% endif %}
               </div>
 
               {% if post.pin %}

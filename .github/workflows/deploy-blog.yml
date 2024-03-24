@@ -51,13 +51,15 @@ jobs:
                   mv ${dir_name}/${dir_name}.md ${first_commit_date}-${dir_name}.md
                   rm -rf ${dir_name}
 
-                  forks=$(curl -SsL https://api.github.com/gists/${id}/forks | jq length)
+                  forks=$(gh api /gists/${id}/forks | jq length)
                   stars=$(gh api graphql -f query="query{viewer{gist(name:\"${id}\"){stargazerCount}}}" --template='{{.data.viewer.gist.stargazerCount}}')
+                  comments=$(gh api /gists/${id}/comments | jq length)
 
                   title=$(grep -m 1 '^#' ${file_name} | sed 's/^# *//')
                   sed -i "/^# ${title}$/,+1 d" ${file_name}
 
                   echo "Add Source"
+                  echo -e "\n\n[**Show comments**](https://gist.github.com/${gh_user}/${id}#comments)" >> ${file_name}
                   echo -e "\n\n**Gist-Source:** [${dir_name}.md](https://gist.github.com/${gh_user}/${id}/)" >> ${file_name}
 
                   echo "Add Header"
@@ -70,6 +72,7 @@ jobs:
           tags: [gist]
           stars: ${stars}
           forks: ${forks}
+          comments: ${comments}
           ---
 
           $(cat ./${file_name})" > ${file_name}

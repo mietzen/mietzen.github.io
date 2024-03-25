@@ -31,7 +31,7 @@ social:
   name: Nils Stein
   email: webmaster@stack-dev.de # change to your email address
 
-theme_mode: # [light | dark]
+theme_mode: dark # [light | dark]
 
 # the avatar on sidebar, support local or CORS resources
 avatar: assets/cyborg_pixel_toast_spacing.png
@@ -85,7 +85,7 @@ defaults:
       type: posts
     values:
       layout: post
-      comments: true # Enable comments in posts.
+      comments: false # Enable comments in posts.
       toc: true # Display TOC column in posts.
       # DO NOT modify the following parameter unless you are confident enough
       # to update the code of all other post links in this project.
@@ -103,7 +103,7 @@ defaults:
   - scope:
       path: assets/js/dist
     values:
-      swcache: true
+      swcache: false
 
 sass:
   style: compressed

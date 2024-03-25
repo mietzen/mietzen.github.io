@@ -70,9 +70,10 @@ jobs:
           author: ${gh_user}
           categories: [Coding]
           tags: [gist]
-          stars: ${stars}
-          forks: ${forks}
-          comments: ${comments}
+          gist_stars: ${stars}
+          gist_forks: ${forks}
+          gist_comments: ${comments}
+          gist_id: ${id}
           ---
 
           $(cat ./${file_name})" > ${file_name}

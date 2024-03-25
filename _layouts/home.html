@@ -92,15 +92,15 @@ refactor: true
                   </span>
                 {% endif %}
                 <!-- gist stars -->
-                {% if post.stars %}
+                {% if post.gist_stars %}
                   <span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa-solid fa-star"></i>&nbsp;&nbsp;<b>{{ post.stars }}</b>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa-solid fa-star"></i>&nbsp;&nbsp;<b>{{ post.gist_stars }}</b>
                   </span>
                 {% endif %}
                 <!-- gist comments -->
-                {% if post.comments %}
+                {% if post.gist_comments %}
                   <span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa-solid fa-comment"></i>&nbsp;&nbsp;<b>{{ post.comments }}</b>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa-solid fa-comment"></i>&nbsp;&nbsp;<b>{{ post.gist_comments }}</b>
                   </span>
                 {% endif %}
               </div>

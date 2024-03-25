@@ -17,40 +17,77 @@ tail_includes:
     {% if page.description %}
       <p class="post-desc fw-light mb-4">{{ page.description }}</p>
     {% endif %}
-
     <div class="post-meta text-muted">
-      <!-- published date -->
-      <span>
-        {{ site.data.locales[lang].post.posted }}
-        {% include datetime.html date=page.date tooltip=true lang=lang %}
+      <span
+        class="date"
+        data-bs-toggle="tooltip"
+        data-bs-placement="bottom"
+        title="Created: {{ page.date | date: '%d.%m.%Y %H:%M' }}"
+        >
+        <a href="https://gist.github.com/mietzen/{{ page.gist_id }}" style="text-decoration: none; color: inherit;">
+          <i class="far fa-calendar fa-fw me-1"></i>
+          <b>{{ page.date | date: '%d %b %Y' }}</b>
+        </a>
+        {% if page.description %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
       </span>
 
       <!-- lastmod date -->
       {% if page.last_modified_at and page.last_modified_at != page.date %}
-        <span>
-          {{ site.data.locales[lang].post.updated }}
-          {% include datetime.html date=page.last_modified_at tooltip=true lang=lang %}
+        <span
+          class="lastmodifiedat"
+          data-bs-toggle="tooltip"
+          data-bs-placement="bottom"
+          title="Edited: {{ page.last_modified_at | date: '%d.%m.%Y %H:%M' }}"
+          >
+          <a href="https://gist.github.com/mietzen/{{ page.gist_id }}/revisions" style="text-decoration: none; color: inherit;">
+            <i class="fa-solid fa-user-pen"></i>&nbsp;&nbsp;
+            <b>{{ page.last_modified_at | date: '%d %b %Y' }}</b>
+          </a>
+          {% if page.description %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
         </span>
       {% endif %}
 
       <!-- gist stars -->
-      {% if page.stars %}
-        <span>
-          <i class="fa-solid fa-star"></i>&nbsp;&nbsp;<b>{{ page.stars }}</b>
+      {% if page.gist_stars %}
+        <span
+          class="giststars"
+          data-bs-toggle="tooltip"
+          data-bs-placement="bottom"
+          title="{{ page.gist_stars }} Stars on Gist"
+          >
+          <a href="https://gist.github.com/mietzen/{{ page.gist_id }}/stargazers" style="text-decoration: none; color: inherit;">
+            <i class="fa-solid fa-star"></i>&nbsp;&nbsp;<b>{{ page.gist_stars }}</b>
+          </a>
+          {% if page.description %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
         </span>
       {% endif %}
 
       <!-- gist forks -->
-      {% if page.forks %}
-        <span>
-          <i class="fa-solid fa-code-branch"></i>&nbsp;&nbsp;<b>{{ page.forks }}</b>
+      {% if page.gist_forks %}
+        <span
+          class="gistforks"
+          data-bs-toggle="tooltip"
+          data-bs-placement="bottom"
+          title="{{ page.gist_forks }} Forks on Gist"
+          >
+          <a href="https://gist.github.com/mietzen/{{ page.gist_id }}/forks" style="text-decoration: none; color: inherit;">
+            <i class="fa-solid fa-code-branch"></i>&nbsp;&nbsp;<b>{{ page.gist_forks }}</b>
+          </a>
+          {% if page.description %}&nbsp;&nbsp;•&nbsp;&nbsp;{% endif %}
         </span>
       {% endif %}
 
       <!-- gist comments -->
-      {% if page.comments %}
-        <span>
-          <i class="fa-regular fa-comment"></i>&nbsp;&nbsp;<b>{{ page.comments }}</b>
+      {% if page.gist_comments %}
+        <span
+            class="gistcomments"
+            data-bs-toggle="tooltip"
+            data-bs-placement="bottom"
+            title="{{ page.gist_comments }} Comments on Gist"
+          >
+          <a href="https://gist.github.com/mietzen/{{ page.gist_id }}#comments" style="text-decoration: none; color: inherit;">
+            <i class="fa-regular fa-comment"></i>&nbsp;&nbsp;<b>{{ page.gist_comments }}</b>
+          </a>
         </span>
       {% endif %}
 

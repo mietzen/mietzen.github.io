@@ -9,8 +9,6 @@ I'm Nils, a dedicated mechanical engineer with a keen focus on renewable energy 
 
 At present, I am deeply engaged in a significant project: leading the development of a cloud-based Data Science Platform at GP-Joule. This endeavor not only reflects my profound dedication to renewable energy but also underscores my proficiency in software engineering. It represents a fusion of my commitment to innovation and my vision for harnessing technology to foster sustainable solutions.
 
-## CV
-
 ### Work Experience
 
 **DevOps Engineer**\
@@ -51,7 +49,7 @@ At present, I am deeply engaged in a significant project: leading the developmen
 
 ### Education
 
-**Master of Science in Sustainable Energy Systems in Mechanical Engineering**\
+**Master of Science in Sustainable Energy Systems**\
 *Hamburg University of Applied Sciences, Hamburg*\
 *Sep 2013 to May 2015*\
 *GPA: 1.2 (excellent)*

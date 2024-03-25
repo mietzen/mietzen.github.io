@@ -22,6 +22,9 @@ At present, I am deeply engaged in a significant project: leading the developmen
 - Establishing and managing a dedicated DevOps team responsible for the continuous maintenance, scaling, and seamless operation of the platform.
 - Collaborating closely with external service providers to streamline operational tasks effectively.
 
+**Parental Leave**\
+*May 2021 to Dec 2022*
+
 **DevOps Engineer**\
 *Digitalwerk GmbH, Regensburg*\
 *Jul 2018 to Jun 2021*

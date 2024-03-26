@@ -45,8 +45,10 @@ jobs:
           gh gist list --public --limit 1000 | awk '{print $1}' | while read -r id; do
               dir_name=$(gh gist view --files "${id}" | grep '\.md'  | cut -d '.' -f1)
               if [[ ${dir_name} ]]; then
+                  # Clone
                   gh gist clone ${id} "${dir_name}"
 
+                  # Collect meta data
                   cd ${dir_name}
                   first_commit_date=$(git log --reverse --format=%ad --date=format:'%Y-%m-%d' | head -n 1)
                   first_commit_ts=$(git log --reverse --format=%ad --date=format:'%Y-%m-%d %H:%M:%S' | head -n 1)
@@ -62,6 +64,8 @@ jobs:
                   comments=$(gh api /gists/${id}/comments | jq length)
 
                   title=$(grep -m 1 '^#' ${file_name} | sed 's/^# *//')
+
+                  # Modify Markdown
                   sed -i "/^# ${title}$/,+1 d" ${file_name}
 
                   echo "Add Source"
@@ -83,18 +87,20 @@ jobs:
           ---
 
           $(cat ./${file_name})" > ${file_name}
+
+                  # Save meta data
                   echo "${file_name}:
-            - title: ${title}
-            - date: ${first_commit_ts}
-            - last_modified_at: ${latest_edited}
-            - author: ${gh_user}
-            - categories: [Coding]
-            - tags: [gist]
-            - gist_stars: ${stars}
-            - gist_forks: ${forks}
-            - gist_comments: ${comments}
-            - gist_id: ${id}
-                  " >> ${base_dir}/posts-metaDB.yaml
+            title: ${title}
+            date: ${first_commit_ts}
+            last_modified_at: ${latest_edited}
+            author: ${gh_user}
+            categories: [Coding]
+            tags: [gist]
+            gist_stars: ${stars}
+            gist_forks: ${forks}
+            gist_comments: ${comments}
+            gist_id: ${id}
+            " >> ${base_dir}/posts-metaDB.yaml
               fi
           done
 
@@ -119,7 +125,7 @@ jobs:
 
           cd ${{ github.workspace }}
           mkdir -p ./_posts/
-          mkdir -p ./_site/
+          mkdir -p ./assets/
           echo ""
           echo "Copying generated files:"
           echo "------------------------"

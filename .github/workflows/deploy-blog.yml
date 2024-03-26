@@ -77,7 +77,7 @@ jobs:
           ---
 
           $(cat ./${file_name})" > ${file_name}
-                  echo "${filename}:
+                  echo "${file_name}:
             - title: ${title}
             - date: ${first_commit_ts}
             - last_modified_at: ${latest_edited}

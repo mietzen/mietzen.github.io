@@ -33,6 +33,12 @@ jobs:
           base_dir=$(pwd)
           gh_user=$(gh api user | jq -r '.login')
 
+          echo "---
+          permalink: /posts-metaDB.yaml
+          # Post Meta-Database
+          ---
+          " > ${base_dir}/posts-metaDB.yaml
+
           echo ""
           echo "Getting Gists:"
           echo "--------------"

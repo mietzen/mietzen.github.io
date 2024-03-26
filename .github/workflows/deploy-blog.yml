@@ -77,6 +77,18 @@ jobs:
           ---
 
           $(cat ./${file_name})" > ${file_name}
+                  echo "${filename}:
+            - title: ${title}
+            - date: ${first_commit_ts}
+            - last_modified_at: ${latest_edited}
+            - author: ${gh_user}
+            - categories: [Coding]
+            - tags: [gist]
+            - gist_stars: ${stars}
+            - gist_forks: ${forks}
+            - gist_comments: ${comments}
+            - gist_id: ${id}
+                  " >> ${base_dir}/posts-metaDB.yaml
               fi
           done
 
@@ -101,10 +113,12 @@ jobs:
 
           cd ${{ github.workspace }}
           mkdir -p ./_posts/
+          mkdir -p ./_site/
           echo ""
           echo "Copying generated files:"
           echo "------------------------"
           cp -Rv ${base_dir}/*.md ./_posts/
+          cp ${base_dir}/posts-metaDB.yaml ./assets/
 
           echo ""
           echo "Removing files that no longer exist as Gist:"

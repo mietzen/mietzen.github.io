@@ -175,10 +175,17 @@ jobs:
               fi
           done
 
-      - name: Decrypt imprint adress
+      - name: Decrypt imprint address
         run: |
           decrypted_text=$(sed -n '0,/.*\[OBFUSCATED\]\(.*\)\[\/OBFUSCATED\].*/s//\1/p' _tabs/imprint-and-privacy-policy.md | base64 -d)
           sed -i -E "s/\[OBFUSCATED\][a-zA-Z0-9=+\/]+\[\/OBFUSCATED\]/${decrypted_text}/g" _tabs/imprint-and-privacy-policy.md
+
+      - name: Markdown Artifact
+        uses: actions/upload-artifact@v4
+        with:
+            name: markdown_pages
+            path: .
+            retention-days: 3
 
       - name: Build site
         run: bundle exec jekyll b

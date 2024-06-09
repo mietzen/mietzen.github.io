@@ -66,8 +66,26 @@ jobs:
                   title=$(grep -m 1 '^#' ${file_name} | sed 's/^# *//')
 
                   # Modify Markdown
+                  echo "Set Title"
                   sed -i "/^# ${title}$/,+1 d" ${file_name}
 
+                  echo "Add raw tag to code blocks"
+                  awk '
+          BEGIN { inBlock = 0 }
+          /^```/ {
+            if (inBlock == 0) {
+              print "{% raw %}"
+              print $0
+              inBlock = 1
+            } else {
+              print $0
+              print "{% endraw %}"
+              inBlock = 0
+            }
+            next
+          }
+          { print $0 }
+          ' ${file_name} > ${file_name}
                   echo "Add Source"
                   echo -e "\n\n[**Show comments**](https://gist.github.com/${gh_user}/${id}#comments)" >> ${file_name}
                   echo -e "\n\n**Gist-Source:** [${dir_name}.md](https://gist.github.com/${gh_user}/${id}/)" >> ${file_name}

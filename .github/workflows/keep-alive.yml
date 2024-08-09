@@ -13,13 +13,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: 'keep_alive'
-          fetch-depth: 0
       - name: Keep Alive Commit
         run: |
-          git reset --hard $(git rev-list --max-parents=0 --abbrev-commit HEAD)
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action Bot"
-          git commit --allow-empty -m "Keep alive commit"
-          git push -f
+          if [ $(git ls-remote --heads origin refs/heads/keep-alive | wc -w) -eq 0 ]; then
+            git switch --orphan keep-alive
+            git commit --allow-empty -m "Initial keep alive commit"
+            git push -u origin keep-alive
+          else
+            git switch keep-alive
+            git reset --hard $(git rev-list --max-parents=0 --abbrev-commit HEAD)
+            git commit --allow-empty -m "Keep alive commit"
+            git push -f
+          fi

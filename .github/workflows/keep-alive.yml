@@ -1,0 +1,25 @@
+name: Keep actions alive
+
+on:
+  schedule:
+   - cron: "0 0 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  Keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 'keep_alive'
+          fetch-depth: 0
+      - name: Keep Alive Commit
+        run: |
+          git reset --hard $(git rev-list --max-parents=0 --abbrev-commit HEAD)
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+          git commit --allow-empty -m "Keep alive commit"
+          git push -f
